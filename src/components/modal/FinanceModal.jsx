@@ -22,14 +22,18 @@ const FinanceModal = ({
 
   const isEditMode = mode === "edit";
   const currentType = form.type || type;
-  const isIncome = currentType === "income";
 
   const modalTitle = useMemo(() => {
-    if (isEditMode) {
-      return isIncome ? "Geliri Güncelle" : "Gideri Güncelle";
+    if (currentType === "income") {
+      return isEditMode ? "Geliri Güncelle" : "Gelir Ekle";
     }
-    return isIncome ? "Gelir Ekle" : "Gider Ekle";
-  }, [isEditMode, isIncome]);
+
+    if (currentType === "expense") {
+      return isEditMode ? "Gideri Güncelle" : "Gider Ekle";
+    }
+
+    return isEditMode ? "Yatırımı Güncelle" : "Yatırım Ekle";
+  }, [currentType, isEditMode]);
 
   useEffect(() => {
     if (isOpen) {
@@ -75,6 +79,13 @@ const FinanceModal = ({
     handleClose();
   };
 
+  const submitButtonClass =
+    currentType === "income"
+      ? "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
+      : currentType === "expense"
+        ? "bg-rose-500 text-white hover:bg-rose-400"
+        : "bg-amber-400 text-slate-950 hover:bg-amber-300";
+
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-[2px]">
       <div className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-violet-500/20 bg-slate-950 text-white shadow-2xl shadow-black/50">
@@ -99,6 +110,7 @@ const FinanceModal = ({
               >
                 <option value="income">Gelir</option>
                 <option value="expense">Gider</option>
+                <option value="investment">Yatırım</option>
               </select>
             </div>
           )}
@@ -112,7 +124,13 @@ const FinanceModal = ({
               name="title"
               value={form.title}
               onChange={handleChange}
-              placeholder={isIncome ? "Örn: Maaş" : "Örn: Kira"}
+              placeholder={
+                currentType === "income"
+                  ? "Örn: Maaş"
+                  : currentType === "expense"
+                    ? "Örn: Kira"
+                    : "Örn: Altın Alımı"
+              }
               className="input dark-input h-12 w-full rounded-2xl"
             />
           </div>
@@ -173,10 +191,7 @@ const FinanceModal = ({
 
             <button
               type="submit"
-              className={`btn h-12 rounded-2xl border-0 font-semibold ${isIncome
-                  ? "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
-                  : "bg-rose-500 text-white hover:bg-rose-400"
-                }`}
+              className={`btn h-12 rounded-2xl border-0 font-semibold ${submitButtonClass}`}
             >
               {isEditMode ? "Güncelle" : "Kaydet"}
             </button>

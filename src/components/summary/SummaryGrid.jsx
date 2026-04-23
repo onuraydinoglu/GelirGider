@@ -7,7 +7,7 @@ const SummaryGrid = ({ totals }) => {
       <SummaryCard
         title="Toplam Bakiye"
         value={formatCurrency(totals.balance)}
-        subtitle="Gelir - Gider"
+        subtitle="Gelir - Gider - Yatırım"
         colorClass={totals.balance >= 0 ? "bg-emerald-400" : "bg-rose-400"}
         iconBg="from-violet-500/80 to-fuchsia-500/50"
       />
@@ -29,11 +29,11 @@ const SummaryGrid = ({ totals }) => {
       />
 
       <SummaryCard
-        title="Toplam İşlem"
-        value={totals.totalCount}
-        subtitle="Sistemdeki kayıt sayısı"
-        colorClass="bg-sky-400"
-        iconBg="from-sky-500/80 to-indigo-500/50"
+        title="Toplam Yatırım"
+        value={formatCurrency(totals.totalInvestment)}
+        subtitle="Kayıtlı tüm yatırımlar"
+        colorClass="bg-amber-400"
+        iconBg="from-amber-400/80 to-yellow-500/50"
       />
     </div>
   );

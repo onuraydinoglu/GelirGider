@@ -19,6 +19,7 @@ const MonthlySummaryTable = ({ monthlyData, selectedMonth, onSelectMonth }) => {
               <th>Ay</th>
               <th>Gelir</th>
               <th>Gider</th>
+              <th>Yatırım</th>
               <th>Kalan</th>
               <th>İşlem Sayısı</th>
               <th>Detay</th>
@@ -46,6 +47,10 @@ const MonthlySummaryTable = ({ monthlyData, selectedMonth, onSelectMonth }) => {
 
                   <td className="font-semibold text-rose-400">
                     - {formatCurrency(month.expense)}
+                  </td>
+
+                  <td className="font-semibold text-amber-300">
+                    - {formatCurrency(month.investment)}
                   </td>
 
                   <td

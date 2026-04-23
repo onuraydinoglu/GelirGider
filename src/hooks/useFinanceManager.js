@@ -21,6 +21,14 @@ const sampleTransactions = [
     note: "Haftalık alışveriş",
     date: getToday(),
   },
+  {
+    id: generateId(),
+    type: "investment",
+    title: "Altın Alımı",
+    amount: 5000,
+    note: "Aylık yatırım",
+    date: getToday(),
+  },
 ];
 
 const getMonthKey = (date) => {
@@ -131,10 +139,15 @@ export const useFinanceManager = () => {
       .filter((item) => item.type === "expense")
       .reduce((sum, item) => sum + item.amount, 0);
 
+    const totalInvestment = transactions
+      .filter((item) => item.type === "investment")
+      .reduce((sum, item) => sum + item.amount, 0);
+
     return {
       totalIncome,
       totalExpense,
-      balance: totalIncome - totalExpense,
+      totalInvestment,
+      balance: totalIncome - totalExpense - totalInvestment,
       totalCount: transactions.length,
     };
   }, [transactions]);
@@ -149,6 +162,7 @@ export const useFinanceManager = () => {
           monthLabel: getMonthLabel(monthKey),
           income: 0,
           expense: 0,
+          investment: 0,
           balance: 0,
           transactions: [],
         };
@@ -156,12 +170,15 @@ export const useFinanceManager = () => {
 
       if (item.type === "income") {
         acc[monthKey].income += item.amount;
-      } else {
+      } else if (item.type === "expense") {
         acc[monthKey].expense += item.amount;
+      } else if (item.type === "investment") {
+        acc[monthKey].investment += item.amount;
       }
 
       acc[monthKey].transactions.push(item);
-      acc[monthKey].balance = acc[monthKey].income - acc[monthKey].expense;
+      acc[monthKey].balance =
+        acc[monthKey].income - acc[monthKey].expense - acc[monthKey].investment;
 
       return acc;
     }, {});

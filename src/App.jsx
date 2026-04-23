@@ -35,6 +35,7 @@ function App() {
 
   const [incomeModalOpen, setIncomeModalOpen] = useState(false);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const [investmentModalOpen, setInvestmentModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
@@ -47,9 +48,7 @@ function App() {
   }, []);
 
   const currentMonthData = useMemo(() => {
-    return (
-      monthlyData.find((item) => item.monthKey === currentMonthKey) || null
-    );
+    return monthlyData.find((item) => item.monthKey === currentMonthKey) || null;
   }, [monthlyData, currentMonthKey]);
 
   const currentMonthTransactions = currentMonthData?.transactions || [];
@@ -58,12 +57,15 @@ function App() {
   const handleAddTransaction = (payload) => {
     addTransaction(payload);
 
+    const messageMap = {
+      income: "Gelir kaydı başarıyla eklendi.",
+      expense: "Gider kaydı başarıyla eklendi.",
+      investment: "Yatırım kaydı başarıyla eklendi.",
+    };
+
     setAlert({
       type: "success",
-      message:
-        payload.type === "income"
-          ? "Gelir kaydı başarıyla eklendi."
-          : "Gider kaydı başarıyla eklendi.",
+      message: messageMap[payload.type],
     });
   };
 
@@ -120,6 +122,7 @@ function App() {
       <Topbar
         onOpenIncomeModal={() => setIncomeModalOpen(true)}
         onOpenExpenseModal={() => setExpenseModalOpen(true)}
+        onOpenInvestmentModal={() => setInvestmentModalOpen(true)}
       />
 
       <AlertMessage alert={alert} />
@@ -175,6 +178,15 @@ function App() {
       />
 
       <FinanceModal
+        key={`investment-create-${investmentModalOpen}`}
+        isOpen={investmentModalOpen}
+        onClose={() => setInvestmentModalOpen(false)}
+        onSubmit={handleAddTransaction}
+        type="investment"
+        mode="create"
+      />
+
+      <FinanceModal
         key={`edit-${editingTransaction?.id || "empty"}-${editModalOpen}`}
         isOpen={editModalOpen}
         onClose={handleCloseEditModal}
@@ -197,7 +209,7 @@ function App() {
         onClose={() => setClearModalOpen(false)}
         onConfirm={handleClearAll}
         title="Tüm kayıtlar temizlensin mi?"
-        description="Bu işlem tüm gelir ve gider kayıtlarını siler. Önce yedek alman önerilir."
+        description="Bu işlem tüm gelir, gider ve yatırım kayıtlarını siler. Önce yedek alman önerilir."
       />
     </AppShell>
   );
