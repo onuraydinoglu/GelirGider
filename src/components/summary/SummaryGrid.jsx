@@ -8,7 +8,7 @@ const SummaryGrid = ({ totals }) => {
         title="Toplam Bakiye"
         value={formatCurrency(totals.balance)}
         subtitle="Gelir - Gider - Yatırım"
-        colorClass={totals.balance >= 0 ? "bg-emerald-400" : "bg-rose-400"}
+        colorClass={totals.balance >= 0 ? "bg-violet-500/80" : "bg-rose-400"}
         iconBg="from-violet-500/80 to-fuchsia-500/50"
       />
 
