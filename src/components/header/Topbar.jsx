@@ -20,10 +20,10 @@ const Topbar = ({ onOpenIncomeModal, onOpenExpenseModal }) => {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <button
             onClick={onOpenIncomeModal}
-            className="btn w-40 h-12 rounded-2xl border border-white/10 bg-emerald-500 text-slate-200 hover:border-violet-400/30 hover:bg-emerald-600/70"
+            className="btn h-12 rounded-2xl border border-white/10 bg-emerald-500 text-slate-200 hover:border-violet-400/30 hover:bg-emerald-600/70"
           >
             <HiOutlineArrowTrendingUp className="text-xl" />
-            Gelir Ekles
+            Gelir Ekle
           </button>
 
           <button
