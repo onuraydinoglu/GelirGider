@@ -12,6 +12,9 @@ import SelectedMonthDetails from "./components/monthly/SelectedMonthDetails";
 import { useFinanceManager } from "./hooks/useFinanceManager";
 import { useToast } from "./hooks/useToast";
 
+import OptionModal from "./components/modal/OptionModal";
+import { useTransactionOptions } from "./hooks/useTransactionOptions";
+
 function App() {
   const {
     transactions,
@@ -117,6 +120,36 @@ function App() {
     setEditingTransaction(null);
   };
 
+  const { options, addOption, deleteOption } = useTransactionOptions();
+
+  const handleDeleteOption = (type, value) => {
+    const result = deleteOption(type, value);
+
+    setAlert({
+      type: result.success ? "success" : "error",
+      message: result.message,
+    });
+  };
+
+  const [optionModalOpen, setOptionModalOpen] = useState(false);
+  const [optionModalType, setOptionModalType] = useState("income");
+
+  const handleOpenOptionModal = (type) => {
+    setOptionModalType(type);
+    setOptionModalOpen(true);
+  };
+
+  const handleAddOption = (type, value) => {
+    const result = addOption(type, value);
+
+    setAlert({
+      type: result.success ? "success" : "error",
+      message: result.message,
+    });
+
+    return result;
+  };
+
   return (
     <AppShell>
       <Topbar
@@ -166,6 +199,8 @@ function App() {
         onSubmit={handleAddTransaction}
         type="income"
         mode="create"
+        options={options}
+        onOpenOptionModal={handleOpenOptionModal}
       />
 
       <FinanceModal
@@ -175,6 +210,8 @@ function App() {
         onSubmit={handleAddTransaction}
         type="expense"
         mode="create"
+        options={options}
+        onOpenOptionModal={handleOpenOptionModal}
       />
 
       <FinanceModal
@@ -184,6 +221,8 @@ function App() {
         onSubmit={handleAddTransaction}
         type="investment"
         mode="create"
+        options={options}
+        onOpenOptionModal={handleOpenOptionModal}
       />
 
       <FinanceModal
@@ -194,6 +233,8 @@ function App() {
         type={editingTransaction?.type || "income"}
         mode="edit"
         initialData={editingTransaction}
+        options={options}
+        onOpenOptionModal={handleOpenOptionModal}
       />
 
       <ConfirmModal
@@ -210,6 +251,15 @@ function App() {
         onConfirm={handleClearAll}
         title="Tüm kayıtlar temizlensin mi?"
         description="Bu işlem tüm gelir, gider ve yatırım kayıtlarını siler. Önce yedek alman önerilir."
+      />
+
+      <OptionModal
+        isOpen={optionModalOpen}
+        onClose={() => setOptionModalOpen(false)}
+        type={optionModalType}
+        options={options[optionModalType] || []}
+        onSubmit={handleAddOption}
+        onDelete={handleDeleteOption}
       />
     </AppShell>
   );

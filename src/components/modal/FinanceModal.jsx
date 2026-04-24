@@ -17,6 +17,8 @@ const FinanceModal = ({
   type,
   mode = "create",
   initialData = null,
+  options = [],
+  onOpenOptionModal,
 }) => {
   const [form, setForm] = useState(() => createInitialForm(initialData, type));
 
@@ -47,13 +49,29 @@ const FinanceModal = ({
 
   if (!isOpen) return null;
 
+  const currentOptions = options[currentType] || [];
+
+  const selectOptions = form.title
+    ? Array.from(new Set([...currentOptions, form.title]))
+    : currentOptions;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => {
+      if (name === "type") {
+        return {
+          ...prev,
+          type: value,
+          title: "",
+        };
+      }
+
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
 
   const handleClose = () => {
@@ -106,7 +124,7 @@ const FinanceModal = ({
                 name="type"
                 value={form.type}
                 onChange={handleChange}
-                className="input dark-input h-12 w-full rounded-2xl"
+                className="select dark-input h-12 w-full rounded-2xl"
               >
                 <option value="income">Gelir</option>
                 <option value="expense">Gider</option>
@@ -117,22 +135,33 @@ const FinanceModal = ({
 
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-300">
-              Başlık
+              Alan
             </label>
-            <input
-              type="text"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder={
-                currentType === "income"
-                  ? "Örn: Maaş"
-                  : currentType === "expense"
-                    ? "Örn: Kira"
-                    : "Örn: Altın Alımı"
-              }
-              className="input dark-input h-12 w-full rounded-2xl"
-            />
+
+            <div className="flex gap-2">
+              <select
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                className="select dark-input h-12 flex-1 rounded-2xl"
+              >
+                <option value="">Seçiniz</option>
+
+                {selectOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={() => onOpenOptionModal(currentType)}
+                className="btn h-12 w-12 rounded-2xl border border-violet-400/20 bg-violet-500/15 text-xl font-bold text-violet-300 hover:bg-violet-500/25"
+              >
+                +
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
