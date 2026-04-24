@@ -8,6 +8,7 @@ import { downloadBackupFile } from "../../utils/backup";
 
 const BackupPanel = ({
   transactions,
+  options,
   onImport,
   onAskClearAll,
   setAlert,
@@ -15,7 +16,7 @@ const BackupPanel = ({
   const fileInputRef = useRef(null);
 
   const handleBackup = () => {
-    downloadBackupFile(transactions);
+    downloadBackupFile(transactions, options);
 
     setAlert({
       type: "success",

@@ -120,7 +120,25 @@ function App() {
     setEditingTransaction(null);
   };
 
-  const { options, addOption, deleteOption } = useTransactionOptions();
+  const { options, addOption, deleteOption, importOptions } =
+    useTransactionOptions();
+
+  const handleImportBackup = (backupData) => {
+    const transactionResult = importTransactions(backupData);
+
+    if (!transactionResult.valid) {
+      return transactionResult;
+    }
+
+    if (backupData.options) {
+      importOptions(backupData.options);
+    }
+
+    return {
+      valid: true,
+      message: "Yedek başarıyla geri yüklendi.",
+    };
+  };
 
   const handleDeleteOption = (type, value) => {
     const result = deleteOption(type, value);
@@ -162,7 +180,8 @@ function App() {
 
       <BackupPanel
         transactions={transactions}
-        onImport={importTransactions}
+        options={options}
+        onImport={handleImportBackup}
         onAskClearAll={() => setClearModalOpen(true)}
         setAlert={setAlert}
       />

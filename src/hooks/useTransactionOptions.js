@@ -58,9 +58,34 @@ export const useTransactionOptions = () => {
     };
   };
 
+  const importOptions = (backupOptions) => {
+    if (!backupOptions || typeof backupOptions !== "object") {
+      return {
+        success: false,
+        message: "Yedek dosyasında select alanları bulunamadı.",
+      };
+    }
+
+    setOptions({
+      income: Array.isArray(backupOptions.income) ? backupOptions.income : [],
+      expense: Array.isArray(backupOptions.expense)
+        ? backupOptions.expense
+        : [],
+      investment: Array.isArray(backupOptions.investment)
+        ? backupOptions.investment
+        : [],
+    });
+
+    return {
+      success: true,
+      message: "Select alanları başarıyla geri yüklendi.",
+    };
+  };
+
   return {
     options,
     addOption,
     deleteOption,
+    importOptions,
   };
 };

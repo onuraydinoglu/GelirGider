@@ -1,17 +1,18 @@
 const APP_NAME = "finance-tracker";
-const BACKUP_VERSION = 1;
+const BACKUP_VERSION = 2;
 
-export const createBackupPayload = (transactions) => {
+export const createBackupPayload = (transactions, options) => {
   return {
     app: APP_NAME,
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
     transactions,
+    options,
   };
 };
 
-export const downloadBackupFile = (transactions) => {
-  const payload = createBackupPayload(transactions);
+export const downloadBackupFile = (transactions, options) => {
+  const payload = createBackupPayload(transactions, options);
   const json = JSON.stringify(payload, null, 2);
   const blob = new Blob([json], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -47,18 +48,11 @@ export const validateBackupFile = (data) => {
     };
   }
 
-  for (const item of data.transactions) {
-    if (
-      !item ||
-      typeof item !== "object" ||
-      !["income", "expense"].includes(item.type) ||
-      typeof item.title !== "string"
-    ) {
-      return {
-        valid: false,
-        message: "Yedek dosyasındaki kayıt yapısı hatalı.",
-      };
-    }
+  if (data.options && typeof data.options !== "object") {
+    return {
+      valid: false,
+      message: "Yedek dosyasındaki select alanları hatalı.",
+    };
   }
 
   return {
