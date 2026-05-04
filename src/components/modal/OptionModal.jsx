@@ -83,7 +83,7 @@ const OptionModal = ({
                 Henüz alan eklenmemiş.
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="max-h-[250px] space-y-2 overflow-y-auto pr-1">
                 {options.map((option) => (
                   <div
                     key={option}
