@@ -1,7 +1,24 @@
+import Pagination from "../common/Pagination";
+import { usePagination } from "../../hooks/usePagination";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 
 const SelectedMonthDetails = ({ selectedMonthData }) => {
+  const transactions = selectedMonthData?.transactions || [];
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    setCurrentPage,
+    goPrevious,
+    goNext,
+  } = usePagination({
+    items: transactions,
+    mobilePageSize: 5,
+    desktopPageSize: 10,
+  });
+
   if (!selectedMonthData) return null;
 
   const getTypeStyles = (type) => {
@@ -27,39 +44,39 @@ const SelectedMonthDetails = ({ selectedMonthData }) => {
   };
 
   return (
-    <div className="glass-card overflow-hidden p-4 sm:p-6">
-      <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="glass-card overflow-hidden p-3 sm:p-6">
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-3xl font-bold capitalize text-white">
+          <h2 className="text-2xl font-bold capitalize text-white sm:text-3xl">
             {selectedMonthData.monthLabel}
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="min-w-[150px] rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
+          <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 sm:rounded-2xl sm:px-4 sm:py-3">
             <p className="text-xs text-slate-400">Aylık Gelir</p>
-            <p className="mt-1 text-lg font-bold text-emerald-400">
+            <p className="mt-1 text-sm font-bold text-emerald-400 sm:text-lg">
               + {formatCurrency(selectedMonthData.income)}
             </p>
           </div>
 
-          <div className="min-w-[150px] rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3">
+          <div className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 sm:rounded-2xl sm:px-4 sm:py-3">
             <p className="text-xs text-slate-400">Aylık Gider</p>
-            <p className="mt-1 text-lg font-bold text-rose-400">
+            <p className="mt-1 text-sm font-bold text-rose-400 sm:text-lg">
               - {formatCurrency(selectedMonthData.expense)}
             </p>
           </div>
 
-          <div className="min-w-[150px] rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
+          <div className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 sm:rounded-2xl sm:px-4 sm:py-3">
             <p className="text-xs text-slate-400">Yatırım</p>
-            <p className="mt-1 text-lg font-bold text-amber-300">
+            <p className="mt-1 text-sm font-bold text-amber-300 sm:text-lg">
               - {formatCurrency(selectedMonthData.investment)}
             </p>
           </div>
 
-          <div className="min-w-[150px] rounded-2xl border border-violet-500/20 bg-violet-500/10 px-4 py-3">
+          <div className="rounded-xl border border-violet-400/20 bg-violet-500/10 px-3 py-2 sm:rounded-2xl sm:px-4 sm:py-3">
             <p className="text-xs text-slate-400">Kalan Para</p>
-            <p className="mt-1 text-lg font-bold text-violet-300">
+            <p className="mt-1 text-sm font-bold text-violet-300 sm:text-lg">
               {formatCurrency(selectedMonthData.balance)}
             </p>
           </div>
@@ -67,7 +84,7 @@ const SelectedMonthDetails = ({ selectedMonthData }) => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="table dark-table">
+        <table className="table table-xs dark-table sm:table-md">
           <thead>
             <tr>
               <th>Tarih</th>
@@ -79,7 +96,7 @@ const SelectedMonthDetails = ({ selectedMonthData }) => {
           </thead>
 
           <tbody>
-            {selectedMonthData.transactions.map((item) => (
+            {paginatedItems.map((item) => (
               <tr key={item.id}>
                 <td className="text-slate-300">{formatDate(item.date)}</td>
 
@@ -88,7 +105,7 @@ const SelectedMonthDetails = ({ selectedMonthData }) => {
                 <td>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${getTypeStyles(
-                      item.type
+                      item.type,
                     )}`}
                   >
                     {getTypeLabel(item.type)}
@@ -100,7 +117,9 @@ const SelectedMonthDetails = ({ selectedMonthData }) => {
                 </td>
 
                 <td
-                  className={`text-right font-bold ${getAmountStyles(item.type)}`}
+                  className={`text-right font-bold ${getAmountStyles(
+                    item.type,
+                  )}`}
                 >
                   {getAmountPrefix(item.type)} {formatCurrency(item.amount)}
                 </td>
@@ -109,6 +128,14 @@ const SelectedMonthDetails = ({ selectedMonthData }) => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        onPrevious={goPrevious}
+        onNext={goNext}
+      />
     </div>
   );
 };

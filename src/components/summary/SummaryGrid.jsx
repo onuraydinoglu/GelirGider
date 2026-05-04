@@ -3,7 +3,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 
 const SummaryGrid = ({ totals }) => {
   return (
-    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="mb-4 grid grid-cols-2 gap-2 sm:mb-6 sm:gap-4 xl:grid-cols-4">
       <SummaryCard
         title="Toplam Bakiye"
         value={formatCurrency(totals.balance)}

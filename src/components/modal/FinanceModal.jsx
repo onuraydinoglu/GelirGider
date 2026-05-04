@@ -105,26 +105,31 @@ const FinanceModal = ({
         : "bg-amber-400 text-slate-950 hover:bg-amber-300";
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-[2px]">
-      <div className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-violet-500/20 bg-slate-950 text-white shadow-2xl shadow-black/50">
-        <div className="border-b border-white/5 px-5 py-4 sm:px-6">
-          <h3 className="text-2xl font-bold">{modalTitle}</h3>
-          <p className="mt-2 text-sm text-slate-400">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 px-3 py-4 backdrop-blur-[2px] sm:px-4 sm:py-6">
+      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto overflow-x-hidden rounded-2xl border border-violet-500/20 bg-slate-950 text-white shadow-2xl shadow-black/50 sm:rounded-[28px]">
+        <div className="border-b border-white/5 px-4 py-3 sm:px-6 sm:py-4">
+          <h3 className="text-xl font-bold sm:text-2xl">{modalTitle}</h3>
+
+          <p className="mt-1 text-xs text-slate-400 sm:mt-2 sm:text-sm">
             İşlem detaylarını doldur ve kaydet.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-5 sm:px-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-3 px-4 py-4 sm:space-y-4 sm:px-6 sm:py-5"
+        >
           {isEditMode && (
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">
+              <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
                 Tür
               </label>
+
               <select
                 name="type"
                 value={form.type}
                 onChange={handleChange}
-                className="select dark-input h-12 w-full rounded-2xl"
+                className="select dark-input h-10 w-full rounded-xl text-sm sm:h-12 sm:rounded-2xl"
               >
                 <option value="income">Gelir</option>
                 <option value="expense">Gider</option>
@@ -134,7 +139,7 @@ const FinanceModal = ({
           )}
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-300">
+            <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
               Alan
             </label>
 
@@ -143,7 +148,7 @@ const FinanceModal = ({
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                className="select dark-input h-12 flex-1 rounded-2xl"
+                className="select dark-input h-10 flex-1 rounded-xl text-sm sm:h-12 sm:rounded-2xl"
               >
                 <option value="">Seçiniz</option>
 
@@ -157,18 +162,19 @@ const FinanceModal = ({
               <button
                 type="button"
                 onClick={() => onOpenOptionModal(currentType)}
-                className="btn h-12 w-12 rounded-2xl border border-violet-400/20 bg-violet-500/15 text-xl font-bold text-violet-300 hover:bg-violet-500/25"
+                className="btn h-10 w-10 rounded-xl border border-violet-400/20 bg-violet-500/15 text-lg font-bold text-violet-300 hover:bg-violet-500/25 sm:h-12 sm:w-12 sm:rounded-2xl sm:text-xl"
               >
                 +
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">
+              <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
                 Tutar
               </label>
+
               <input
                 type="number"
                 min="0"
@@ -177,50 +183,52 @@ const FinanceModal = ({
                 value={form.amount}
                 onChange={handleChange}
                 placeholder="0.00"
-                className="input dark-input h-12 w-full rounded-2xl"
+                className="input dark-input h-10 w-full rounded-xl text-sm sm:h-12 sm:rounded-2xl"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">
+              <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
                 Tarih
               </label>
+
               <input
                 type="date"
                 name="date"
                 value={form.date}
                 onChange={handleChange}
-                className="input dark-input h-12 w-full rounded-2xl"
+                className="input dark-input h-10 w-full rounded-xl text-sm sm:h-12 sm:rounded-2xl"
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-300">
+            <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
               Not
             </label>
+
             <textarea
               name="note"
               value={form.note}
               onChange={handleChange}
-              rows="4"
+              rows="3"
               placeholder="İşlemle ilgili not..."
-              className="textarea dark-input w-full rounded-2xl"
+              className="textarea dark-input min-h-20 w-full rounded-xl text-sm sm:min-h-28 sm:rounded-2xl"
             />
           </div>
 
-          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end sm:gap-3 sm:pt-2">
             <button
               type="button"
               onClick={handleClose}
-              className="btn h-12 rounded-2xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+              className="btn h-10 rounded-xl border border-white/10 bg-white/5 text-sm text-slate-200 hover:bg-white/10 sm:h-12 sm:rounded-2xl"
             >
               İptal
             </button>
 
             <button
               type="submit"
-              className={`btn h-12 rounded-2xl border-0 font-semibold ${submitButtonClass}`}
+              className={`btn h-10 rounded-xl border-0 text-sm font-semibold sm:h-12 sm:rounded-2xl ${submitButtonClass}`}
             >
               {isEditMode ? "Güncelle" : "Kaydet"}
             </button>

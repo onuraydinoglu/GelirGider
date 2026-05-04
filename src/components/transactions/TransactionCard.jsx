@@ -45,48 +45,59 @@ const TransactionCard = ({ item, onDelete, onEdit }) => {
   const config = getTypeConfig(item.type);
 
   return (
-    <div className="glass-card p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
+    <div className="glass-card p-3 sm:p-5">
+      <div className="flex items-start justify-between gap-2">
+
+        {/* SOL */}
+        <div className="flex min-w-0 items-start gap-2 sm:gap-3">
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-2xl ${config.wrapper}`}
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12 sm:rounded-2xl ${config.wrapper}`}
           >
             {config.icon}
           </div>
 
-          <div>
-            <h3 className="font-semibold text-white sm:text-lg">{item.title}</h3>
-            <p className="mt-1 text-sm text-slate-400">{formatDate(item.date)}</p>
+          <div className="min-w-0">
+            <h3 className="truncate text-sm font-semibold text-white sm:text-lg">
+              {item.title}
+            </h3>
+
+            <p className="mt-0.5 text-[11px] text-slate-400 sm:mt-1 sm:text-sm">
+              {formatDate(item.date)}
+            </p>
 
             {item.note && (
-              <p className="mt-2 text-sm text-slate-300">{item.note}</p>
+              <p className="mt-1 line-clamp-1 text-xs text-slate-300 sm:mt-2 sm:text-sm">
+                {item.note}
+              </p>
             )}
           </div>
         </div>
 
-        <div className="flex gap-2">
+        {/* ACTIONS */}
+        <div className="flex shrink-0 gap-1 sm:gap-2">
           <button
             onClick={() => onEdit(item)}
-            className="btn btn-sm rounded-xl border-0 bg-indigo-500/15 text-indigo-300 hover:bg-indigo-500/25"
+            className="btn btn-xs rounded-lg border-0 bg-indigo-500/15 text-indigo-300 hover:bg-indigo-500/25 sm:btn-sm sm:rounded-xl"
           >
-            <HiOutlinePencilSquare className="text-lg" />
+            <HiOutlinePencilSquare className="text-sm sm:text-lg" />
           </button>
 
           <button
             onClick={() => onDelete(item)}
-            className="btn btn-sm rounded-xl border-0 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25"
+            className="btn btn-xs rounded-lg border-0 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 sm:btn-sm sm:rounded-xl"
           >
-            <HiOutlineTrash className="text-lg" />
+            <HiOutlineTrash className="text-sm sm:text-lg" />
           </button>
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${config.badge}`}>
+      {/* ALT */}
+      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3 sm:mt-4 sm:pt-4">
+        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-3 sm:py-1 sm:text-xs ${config.badge}`}>
           {config.label}
         </span>
 
-        <span className={`text-lg font-bold ${config.amount}`}>
+        <span className={`text-sm font-bold sm:text-lg ${config.amount}`}>
           {config.prefix} {formatCurrency(item.amount)}
         </span>
       </div>
