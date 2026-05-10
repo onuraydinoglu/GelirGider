@@ -151,11 +151,28 @@ const FinanceModal = ({
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 px-3 py-4 backdrop-blur-[2px] sm:px-4 sm:py-6">
       <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto overflow-x-hidden rounded-2xl border border-violet-500/20 bg-slate-950 text-white shadow-2xl shadow-black/50 sm:rounded-[28px]">
         <div className="border-b border-white/5 px-4 py-3 sm:px-6 sm:py-4">
-          <h3 className="text-xl font-bold sm:text-2xl">{modalTitle}</h3>
+          <div className="mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-xl font-bold sm:text-2xl">{modalTitle}</h3>
+              <p className="text-xs text-slate-400 sm:text-sm">
+                İşlem detaylarını doldur ve kaydet.
+              </p>
+            </div>
 
-          <p className="mt-1 text-xs text-slate-400 sm:mt-2 sm:text-sm">
-            İşlem detaylarını doldur ve kaydet.
-          </p>
+            {showInstallmentCheckbox && (
+              <label className="flex cursor-pointer items-center gap-2 rounded-full border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:border-rose-400/40 hover:bg-rose-500/15">
+                <input
+                  type="checkbox"
+                  name="hasInstallment"
+                  checked={form.hasInstallment}
+                  onChange={handleChange}
+                  className="checkbox checkbox-xs border-rose-400/50 bg-slate-900 checked:border-rose-400 checked:bg-rose-500"
+                />
+
+                <span>Taksitli gider</span>
+              </label>
+            )}
+          </div>
         </div>
 
         <form
@@ -244,25 +261,6 @@ const FinanceModal = ({
               />
             </div>
           </div>
-
-          {showInstallmentCheckbox && (
-            <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 transition hover:border-rose-400/20 hover:bg-rose-500/5 sm:px-4">
-              <input
-                type="checkbox"
-                name="hasInstallment"
-                checked={form.hasInstallment}
-                onChange={handleChange}
-                className="checkbox checkbox-sm border-rose-400/40 bg-slate-900 checked:border-rose-400 checked:bg-rose-500"
-              />
-
-              <div>
-                <p className="text-sm font-bold text-white">Taksitli gider</p>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  İşaretlersen taksit sayısı ve başlangıç tarihi alanları açılır.
-                </p>
-              </div>
-            </label>
-          )}
 
           {showInstallmentFields && (
             <div className="rounded-2xl border border-rose-400/15 bg-rose-500/5 p-3 sm:p-4">
