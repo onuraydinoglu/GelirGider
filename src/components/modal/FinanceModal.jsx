@@ -9,8 +9,10 @@ const createInitialForm = (initialData, type) => ({
   note: initialData?.note || "",
   date: initialData?.date || getToday(),
   type: initialData?.type || type,
+  hasInstallment: Number(initialData?.installmentCount || 1) > 1,
   installmentCount: initialData?.installmentCount || 1,
-  installmentStartDate: initialData?.installmentStartDate || initialData?.date || getToday(),
+  installmentStartDate:
+    initialData?.installmentStartDate || initialData?.date || getToday(),
 });
 
 const FinanceModal = ({
@@ -27,7 +29,11 @@ const FinanceModal = ({
 
   const isEditMode = mode === "edit";
   const currentType = form.type || type;
-  const showInstallmentFields = !isEditMode && currentType === "expense";
+  const isExpenseType = currentType === "expense";
+
+  const showInstallmentCheckbox = !isEditMode && isExpenseType;
+  const showInstallmentFields =
+    showInstallmentCheckbox && form.hasInstallment;
 
   const modalTitle = useMemo(() => {
     if (currentType === "income") {
@@ -61,7 +67,7 @@ const FinanceModal = ({
     : currentOptions;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, checked, type: inputType } = e.target;
 
     setForm((prev) => {
       if (name === "type") {
@@ -69,8 +75,19 @@ const FinanceModal = ({
           ...prev,
           type: value,
           title: "",
+          hasInstallment: false,
           installmentCount: 1,
           installmentStartDate: prev.date || getToday(),
+        };
+      }
+
+      if (name === "hasInstallment") {
+        return {
+          ...prev,
+          hasInstallment: checked,
+          installmentCount: checked ? prev.installmentCount || 2 : 1,
+          installmentStartDate:
+            prev.installmentStartDate || prev.date || getToday(),
         };
       }
 
@@ -85,7 +102,7 @@ const FinanceModal = ({
 
       return {
         ...prev,
-        [name]: value,
+        [name]: inputType === "checkbox" ? checked : value,
       };
     });
   };
@@ -101,9 +118,10 @@ const FinanceModal = ({
     if (!form.title.trim()) return;
     if (!form.amount || Number(form.amount) <= 0) return;
 
-    const installmentCount = Number(form.installmentCount || 1);
-
-    if (showInstallmentFields && installmentCount < 1) return;
+    const installmentCount =
+      showInstallmentFields && Number(form.installmentCount) > 1
+        ? Number(form.installmentCount)
+        : 1;
 
     onSubmit({
       id: form.id,
@@ -112,10 +130,11 @@ const FinanceModal = ({
       note: form.note,
       date: form.date,
       type: form.type,
-      installmentCount: showInstallmentFields ? installmentCount : 1,
-      installmentStartDate: showInstallmentFields
-        ? form.installmentStartDate || form.date
-        : null,
+      installmentCount,
+      installmentStartDate:
+        installmentCount > 1
+          ? form.installmentStartDate || form.date || getToday()
+          : null,
     });
 
     handleClose();
@@ -226,6 +245,25 @@ const FinanceModal = ({
             </div>
           </div>
 
+          {showInstallmentCheckbox && (
+            <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 transition hover:border-rose-400/20 hover:bg-rose-500/5 sm:px-4">
+              <input
+                type="checkbox"
+                name="hasInstallment"
+                checked={form.hasInstallment}
+                onChange={handleChange}
+                className="checkbox checkbox-sm border-rose-400/40 bg-slate-900 checked:border-rose-400 checked:bg-rose-500"
+              />
+
+              <div>
+                <p className="text-sm font-bold text-white">Taksitli gider</p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  İşaretlersen taksit sayısı ve başlangıç tarihi alanları açılır.
+                </p>
+              </div>
+            </label>
+          )}
+
           {showInstallmentFields && (
             <div className="rounded-2xl border border-rose-400/15 bg-rose-500/5 p-3 sm:p-4">
               <div className="mb-3">
@@ -234,8 +272,8 @@ const FinanceModal = ({
                 </h4>
 
                 <p className="mt-1 text-xs text-slate-400">
-                  Taksit sayısı 1’den büyükse her taksit ayrı aylara gider
-                  olarak otomatik eklenir.
+                  Girilen toplam tutar taksit sayısına bölünür ve her ay ayrı
+                  gider olarak eklenir.
                 </p>
               </div>
 
@@ -247,7 +285,7 @@ const FinanceModal = ({
 
                   <input
                     type="number"
-                    min="1"
+                    min="2"
                     step="1"
                     name="installmentCount"
                     value={form.installmentCount}
