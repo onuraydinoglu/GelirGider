@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { getToday } from "../../utils/helpers";
 
 const createInitialForm = (initialData, type) => ({
@@ -8,6 +9,8 @@ const createInitialForm = (initialData, type) => ({
   note: initialData?.note || "",
   date: initialData?.date || getToday(),
   type: initialData?.type || type,
+  installmentCount: initialData?.installmentCount || 1,
+  installmentStartDate: initialData?.installmentStartDate || initialData?.date || getToday(),
 });
 
 const FinanceModal = ({
@@ -24,6 +27,7 @@ const FinanceModal = ({
 
   const isEditMode = mode === "edit";
   const currentType = form.type || type;
+  const showInstallmentFields = !isEditMode && currentType === "expense";
 
   const modalTitle = useMemo(() => {
     if (currentType === "income") {
@@ -39,13 +43,14 @@ const FinanceModal = ({
 
   useEffect(() => {
     if (isOpen) {
+      setForm(createInitialForm(initialData, type));
       document.body.style.overflow = "hidden";
     }
 
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, [isOpen, initialData, type]);
 
   if (!isOpen) return null;
 
@@ -64,6 +69,17 @@ const FinanceModal = ({
           ...prev,
           type: value,
           title: "",
+          installmentCount: 1,
+          installmentStartDate: prev.date || getToday(),
+        };
+      }
+
+      if (name === "date") {
+        return {
+          ...prev,
+          date: value,
+          installmentStartDate:
+            prev.installmentStartDate || value || getToday(),
         };
       }
 
@@ -85,6 +101,10 @@ const FinanceModal = ({
     if (!form.title.trim()) return;
     if (!form.amount || Number(form.amount) <= 0) return;
 
+    const installmentCount = Number(form.installmentCount || 1);
+
+    if (showInstallmentFields && installmentCount < 1) return;
+
     onSubmit({
       id: form.id,
       title: form.title,
@@ -92,6 +112,10 @@ const FinanceModal = ({
       note: form.note,
       date: form.date,
       type: form.type,
+      installmentCount: showInstallmentFields ? installmentCount : 1,
+      installmentStartDate: showInstallmentFields
+        ? form.installmentStartDate || form.date
+        : null,
     });
 
     handleClose();
@@ -202,6 +226,53 @@ const FinanceModal = ({
             </div>
           </div>
 
+          {showInstallmentFields && (
+            <div className="rounded-2xl border border-rose-400/15 bg-rose-500/5 p-3 sm:p-4">
+              <div className="mb-3">
+                <h4 className="text-sm font-semibold text-rose-200">
+                  Taksit Bilgisi
+                </h4>
+
+                <p className="mt-1 text-xs text-slate-400">
+                  Taksit sayısı 1’den büyükse her taksit ayrı aylara gider
+                  olarak otomatik eklenir.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
+                    Kaç Taksit
+                  </label>
+
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    name="installmentCount"
+                    value={form.installmentCount}
+                    onChange={handleChange}
+                    className="input dark-input h-10 w-full rounded-xl text-sm sm:h-12 sm:rounded-2xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
+                    İlk Taksit Tarihi
+                  </label>
+
+                  <input
+                    type="date"
+                    name="installmentStartDate"
+                    value={form.installmentStartDate}
+                    onChange={handleChange}
+                    className="input dark-input h-10 w-full rounded-xl text-sm sm:h-12 sm:rounded-2xl"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-300 sm:mb-2 sm:text-sm">
               Not
@@ -223,12 +294,12 @@ const FinanceModal = ({
               onClick={handleClose}
               className="btn h-10 rounded-xl border border-white/10 bg-white/5 text-sm text-slate-200 hover:bg-white/10 sm:h-12 sm:rounded-2xl"
             >
-              İptal
+              Vazgeç
             </button>
 
             <button
               type="submit"
-              className={`btn h-10 rounded-xl border-0 text-sm font-semibold sm:h-12 sm:rounded-2xl ${submitButtonClass}`}
+              className={`btn h-10 rounded-xl border-0 px-5 text-sm font-bold sm:h-12 sm:rounded-2xl sm:px-7 ${submitButtonClass}`}
             >
               {isEditMode ? "Güncelle" : "Kaydet"}
             </button>

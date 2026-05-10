@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
+
 import { STORAGE_KEYS } from "../constants/storage";
 import { useLocalStorage } from "./useLocalStorage";
+
 import { generateId, getToday } from "../utils/helpers";
+
 import { validateBackupFile } from "../utils/backup";
 
 const sampleTransactions = [
@@ -35,6 +38,7 @@ const getMonthKey = (date) => {
   const current = new Date(date);
   const year = current.getFullYear();
   const month = String(current.getMonth() + 1).padStart(2, "0");
+
   return `${year}-${month}`;
 };
 
@@ -48,6 +52,75 @@ const getMonthLabel = (monthKey) => {
   }).format(date);
 };
 
+const addMonthsToDate = (date, monthCount) => {
+  const [year, month, day] = date.split("-").map(Number);
+
+  const targetDate = new Date(year, month - 1 + monthCount, 1);
+  const targetYear = targetDate.getFullYear();
+  const targetMonth = targetDate.getMonth();
+
+  const lastDayOfTargetMonth = new Date(
+    targetYear,
+    targetMonth + 1,
+    0,
+  ).getDate();
+
+  const safeDay = Math.min(day, lastDayOfTargetMonth);
+
+  const result = new Date(targetYear, targetMonth, safeDay);
+
+  const formattedYear = result.getFullYear();
+  const formattedMonth = String(result.getMonth() + 1).padStart(2, "0");
+  const formattedDay = String(result.getDate()).padStart(2, "0");
+
+  return `${formattedYear}-${formattedMonth}-${formattedDay}`;
+};
+
+const createInstallmentTransactions = (payload) => {
+  const installmentCount = Number(payload.installmentCount || 1);
+  const totalAmount = Number(payload.amount);
+
+  if (payload.type !== "expense" || installmentCount <= 1) {
+    return [
+      {
+        id: generateId(),
+        type: payload.type,
+        title: payload.title.trim(),
+        amount: totalAmount,
+        note: payload.note?.trim() || "",
+        date: payload.date || getToday(),
+      },
+    ];
+  }
+
+  const installmentGroupId = generateId();
+  const startDate = payload.installmentStartDate || payload.date || getToday();
+
+  const baseAmount = Math.floor((totalAmount / installmentCount) * 100) / 100;
+  const calculatedTotal = baseAmount * installmentCount;
+  const remainingAmount = Number((totalAmount - calculatedTotal).toFixed(2));
+
+  return Array.from({ length: installmentCount }, (_, index) => {
+    const isLastInstallment = index === installmentCount - 1;
+
+    return {
+      id: generateId(),
+      type: "expense",
+      title: payload.title.trim(),
+      amount: isLastInstallment
+        ? Number((baseAmount + remainingAmount).toFixed(2))
+        : baseAmount,
+      note: payload.note?.trim() || "",
+      date: addMonthsToDate(startDate, index),
+      installmentGroupId,
+      installmentIndex: index + 1,
+      installmentCount,
+      installmentStartDate: startDate,
+      installmentTotalAmount: totalAmount,
+    };
+  });
+};
+
 export const useFinanceManager = () => {
   const [transactions, setTransactions] = useLocalStorage(
     STORAGE_KEYS.TRANSACTIONS,
@@ -56,22 +129,16 @@ export const useFinanceManager = () => {
 
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [editingTransaction, setEditingTransaction] = useState(null);
+
   const [selectedMonth, setSelectedMonth] = useState(() =>
     getMonthKey(getToday()),
   );
 
   const addTransaction = (payload) => {
-    const newTransaction = {
-      id: generateId(),
-      type: payload.type,
-      title: payload.title.trim(),
-      amount: Number(payload.amount),
-      note: payload.note?.trim() || "",
-      date: payload.date || getToday(),
-    };
+    const newTransactions = createInstallmentTransactions(payload);
 
-    setTransactions((prev) => [newTransaction, ...prev]);
-    setSelectedMonth(getMonthKey(newTransaction.date));
+    setTransactions((prev) => [...newTransactions, ...prev]);
+    setSelectedMonth(getMonthKey(newTransactions[0].date));
   };
 
   const updateTransaction = (payload) => {
@@ -79,13 +146,13 @@ export const useFinanceManager = () => {
       prev.map((item) =>
         item.id === payload.id
           ? {
-              ...item,
-              type: payload.type,
-              title: payload.title.trim(),
-              amount: Number(payload.amount),
-              note: payload.note?.trim() || "",
-              date: payload.date || getToday(),
-            }
+            ...item,
+            type: payload.type,
+            title: payload.title.trim(),
+            amount: Number(payload.amount),
+            note: payload.note?.trim() || "",
+            date: payload.date || getToday(),
+          }
           : item,
       ),
     );
@@ -116,6 +183,10 @@ export const useFinanceManager = () => {
       amount: Number(item.amount || 0),
       note: item.note || "",
       date: item.date || getToday(),
+      installmentGroupId: item.installmentGroupId || null,
+      installmentIndex: item.installmentIndex || null,
+      installmentCount: item.installmentCount || null,
+      installmentStartDate: item.installmentStartDate || null,
     }));
 
     setTransactions(normalizedTransactions);
@@ -131,15 +202,21 @@ export const useFinanceManager = () => {
   };
 
   const totals = useMemo(() => {
-    const totalIncome = transactions
+    const currentMonthKey = getMonthKey(getToday());
+
+    const currentMonthTransactions = transactions.filter(
+      (item) => getMonthKey(item.date) === currentMonthKey,
+    );
+
+    const totalIncome = currentMonthTransactions
       .filter((item) => item.type === "income")
       .reduce((sum, item) => sum + item.amount, 0);
 
-    const totalExpense = transactions
+    const totalExpense = currentMonthTransactions
       .filter((item) => item.type === "expense")
       .reduce((sum, item) => sum + item.amount, 0);
 
-    const totalInvestment = transactions
+    const totalInvestment = currentMonthTransactions
       .filter((item) => item.type === "investment")
       .reduce((sum, item) => sum + item.amount, 0);
 
@@ -148,7 +225,7 @@ export const useFinanceManager = () => {
       totalExpense,
       totalInvestment,
       balance: totalIncome - totalExpense - totalInvestment,
-      totalCount: transactions.length,
+      totalCount: currentMonthTransactions.length,
     };
   }, [transactions]);
 
@@ -177,8 +254,11 @@ export const useFinanceManager = () => {
       }
 
       acc[monthKey].transactions.push(item);
+
       acc[monthKey].balance =
-        acc[monthKey].income - acc[monthKey].expense - acc[monthKey].investment;
+        acc[monthKey].income -
+        acc[monthKey].expense -
+        acc[monthKey].investment;
 
       return acc;
     }, {});
@@ -195,6 +275,7 @@ export const useFinanceManager = () => {
 
   const selectedMonthData = useMemo(() => {
     if (!monthlyData.length) return null;
+
     return (
       monthlyData.find((item) => item.monthKey === selectedMonth) ||
       monthlyData[0]

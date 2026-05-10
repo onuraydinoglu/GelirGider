@@ -96,35 +96,48 @@ const SelectedMonthDetails = ({ selectedMonthData }) => {
           </thead>
 
           <tbody>
-            {paginatedItems.map((item) => (
-              <tr key={item.id}>
-                <td className="text-slate-300">{formatDate(item.date)}</td>
+            {paginatedItems.map((item) => {
+              const isInstallmentExpense =
+                item.type === "expense" && Number(item.installmentCount) > 1;
 
-                <td className="font-semibold text-white">{item.title}</td>
+              return (
+                <tr key={item.id}>
+                  <td className="text-slate-300">{formatDate(item.date)}</td>
 
-                <td>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${getTypeStyles(
+                  <td className="font-semibold text-white">{item.title}</td>
+
+                  <td>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${getTypeStyles(
+                          item.type,
+                        )}`}
+                      >
+                        {getTypeLabel(item.type)}
+                      </span>
+
+                      {isInstallmentExpense && (
+                        <span className="rounded-full bg-violet-500/15 px-3 py-1 text-xs font-semibold text-violet-300">
+                          {item.installmentIndex}/{item.installmentCount} Taksit
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                  <td className="max-w-[320px] truncate text-slate-400">
+                    {item.note || "-"}
+                  </td>
+
+                  <td
+                    className={`text-right font-bold ${getAmountStyles(
                       item.type,
                     )}`}
                   >
-                    {getTypeLabel(item.type)}
-                  </span>
-                </td>
-
-                <td className="max-w-[320px] truncate text-slate-400">
-                  {item.note || "-"}
-                </td>
-
-                <td
-                  className={`text-right font-bold ${getAmountStyles(
-                    item.type,
-                  )}`}
-                >
-                  {getAmountPrefix(item.type)} {formatCurrency(item.amount)}
-                </td>
-              </tr>
-            ))}
+                    {getAmountPrefix(item.type)} {formatCurrency(item.amount)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

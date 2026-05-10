@@ -18,7 +18,6 @@ import { useTransactionOptions } from "./hooks/useTransactionOptions";
 function App() {
   const {
     transactions,
-    totals,
     selectedTransaction,
     setSelectedTransaction,
     editingTransaction,
@@ -47,6 +46,7 @@ function App() {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, "0");
+
     return `${year}-${month}`;
   }, []);
 
@@ -56,6 +56,16 @@ function App() {
 
   const currentMonthTransactions = currentMonthData?.transactions || [];
   const currentMonthLabel = currentMonthData?.monthLabel || "Bu Ay";
+
+  const currentMonthTotals = useMemo(() => {
+    return {
+      totalIncome: currentMonthData?.income || 0,
+      totalExpense: currentMonthData?.expense || 0,
+      totalInvestment: currentMonthData?.investment || 0,
+      balance: currentMonthData?.balance || 0,
+      totalCount: currentMonthData?.transactions?.length || 0,
+    };
+  }, [currentMonthData]);
 
   const handleAddTransaction = (payload) => {
     addTransaction(payload);
@@ -186,7 +196,7 @@ function App() {
         setAlert={setAlert}
       />
 
-      <SummaryGrid totals={totals} />
+      <SummaryGrid totals={currentMonthTotals} />
 
       <div className="mb-6">
         <div className="glass-card p-4 sm:p-5 lg:p-6">
