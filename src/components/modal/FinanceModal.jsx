@@ -151,7 +151,7 @@ const FinanceModal = ({
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 px-3 py-4 backdrop-blur-[2px] sm:px-4 sm:py-6">
       <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto overflow-x-hidden rounded-2xl border border-violet-500/20 bg-slate-950 text-white shadow-2xl shadow-black/50 sm:rounded-[28px]">
         <div className="border-b border-white/5 px-4 py-3 sm:px-6 sm:py-4">
-          <div className="mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-1 flex flex-col gap-3 sm:mt-2 flex-row items-center justify-between">
             <div>
               <h3 className="text-xl font-bold sm:text-2xl">{modalTitle}</h3>
               <p className="text-xs text-slate-400 sm:text-sm">
