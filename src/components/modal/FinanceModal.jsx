@@ -32,8 +32,7 @@ const FinanceModal = ({
   const isExpenseType = currentType === "expense";
 
   const showInstallmentCheckbox = !isEditMode && isExpenseType;
-  const showInstallmentFields =
-    showInstallmentCheckbox && form.hasInstallment;
+  const showInstallmentFields = showInstallmentCheckbox && form.hasInstallment;
 
   const modalTitle = useMemo(() => {
     if (currentType === "income") {

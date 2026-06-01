@@ -18,6 +18,7 @@ import { useTransactionOptions } from "./hooks/useTransactionOptions";
 function App() {
   const {
     transactions,
+    totals,
     selectedTransaction,
     setSelectedTransaction,
     editingTransaction,
@@ -51,7 +52,9 @@ function App() {
   }, []);
 
   const currentMonthData = useMemo(() => {
-    return monthlyData.find((item) => item.monthKey === currentMonthKey) || null;
+    return (
+      monthlyData.find((item) => item.monthKey === currentMonthKey) || null
+    );
   }, [monthlyData, currentMonthKey]);
 
   const currentMonthTransactions = currentMonthData?.transactions || [];
@@ -62,10 +65,11 @@ function App() {
       totalIncome: currentMonthData?.income || 0,
       totalExpense: currentMonthData?.expense || 0,
       totalInvestment: currentMonthData?.investment || 0,
-      balance: currentMonthData?.balance || 0,
+      balance: totals.balance,
+
       totalCount: currentMonthData?.transactions?.length || 0,
     };
-  }, [currentMonthData]);
+  }, [currentMonthData, totals.balance]);
 
   const handleAddTransaction = (payload) => {
     addTransaction(payload);

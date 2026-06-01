@@ -202,30 +202,24 @@ export const useFinanceManager = () => {
   };
 
   const totals = useMemo(() => {
-    const currentMonthKey = getMonthKey(getToday());
-
-    const currentMonthTransactions = transactions.filter(
-      (item) => getMonthKey(item.date) === currentMonthKey,
-    );
-
-    const totalIncome = currentMonthTransactions
+    const totalIncome = transactions
       .filter((item) => item.type === "income")
       .reduce((sum, item) => sum + item.amount, 0);
-
-    const totalExpense = currentMonthTransactions
+  
+    const totalExpense = transactions
       .filter((item) => item.type === "expense")
       .reduce((sum, item) => sum + item.amount, 0);
-
-    const totalInvestment = currentMonthTransactions
+  
+    const totalInvestment = transactions
       .filter((item) => item.type === "investment")
       .reduce((sum, item) => sum + item.amount, 0);
-
+  
     return {
       totalIncome,
       totalExpense,
       totalInvestment,
       balance: totalIncome - totalExpense - totalInvestment,
-      totalCount: currentMonthTransactions.length,
+      totalCount: transactions.length,
     };
   }, [transactions]);
 
